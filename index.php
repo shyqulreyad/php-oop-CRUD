@@ -20,6 +20,18 @@ if(isset($_POST['delete'])){
     header("Location: index.php");
 }
 
+// catch data from update form
+if(isset($_POST['update'])){
+    $id = $_POST['id'];
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $mobile = $_POST['mobile'];
+    $address = $_POST['address'];
+    // update data into database
+    $query->updateData("users", array("name" => $name, "email" => $email, "mobile" => $mobile, "address" => $address), array("id" => $id));
+    header("Location: index.php");
+}
+
 
 ?>
 <!DOCTYPE html>
@@ -314,6 +326,7 @@ if(isset($_POST['delete'])){
 				<tbody>
                     <?php
                             $results = $query->getData('users'); 
+                        if($results){
                             foreach($results as $result){
                     ?>
 					<tr>
@@ -322,12 +335,13 @@ if(isset($_POST['delete'])){
 						<td><?=$result['address']?></td>
 						<td><?=$result['mobile']?></td>
 						<td>
-							<a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+							<a href="#" data="<?=$result['id']?>" data1="<?=$result['name']?>" data2="<?=$result['email']?>" data3="<?=$result['address']?>" data4="<?=$result['mobile']?>" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
 							<a href="#" data="<?=$result['id']?>" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete" >&#xE872;</i></a>
 						</td>
 					</tr>
                     <?php
                             }
+                        }
                     ?>
 				</tbody>
 			</table>
@@ -373,7 +387,7 @@ if(isset($_POST['delete'])){
 <div id="editEmployeeModal" class="modal fade">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<form>
+			<form method="POST" action="index.php">
 				<div class="modal-header">						
 					<h4 class="modal-title">Edit Employee</h4>
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -381,24 +395,25 @@ if(isset($_POST['delete'])){
 				<div class="modal-body">					
 					<div class="form-group">
 						<label>Name</label>
-						<input type="text" class="form-control" required>
+						<input id="name" name="name" type="text" class="form-control" required>
+                        <input type="hidden" name="id" id="update_id">
 					</div>
 					<div class="form-group">
 						<label>Email</label>
-						<input type="email" class="form-control" required>
+						<input id="email" name="email" type="email" class="form-control" required>
 					</div>
 					<div class="form-group">
 						<label>Address</label>
-						<textarea class="form-control" required></textarea>
+						<textarea id="address" name="address" class="form-control" required></textarea>
 					</div>
 					<div class="form-group">
 						<label>Phone</label>
-						<input type="text" class="form-control" required>
+						<input id="mobile" name="mobile" type="text" class="form-control" required>
 					</div>					
 				</div>
 				<div class="modal-footer">
 					<input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-					<input type="submit" class="btn btn-info" value="Save">
+					<input type="submit" name="update" class="btn btn-info" value="Save">
 				</div>
 			</form>
 		</div>
@@ -434,8 +449,23 @@ if(isset($_POST['delete'])){
             $('#deleteEmployeeModal').modal('show');
             var id = $(this).attr('data');
             $('#id_info').val(id);
-            console.log(id);
         
+        });
+
+    //open editEmployeeModal Modal
+        $('.edit').click(function(){
+            $('#editEmployeeModal').modal('show');
+            //add value to input field
+            var id = $(this).attr('data');
+            $('#update_id').val(id);
+            var name = $(this).attr('data1');
+            $('#name').val(name);
+            var email = $(this).attr('data2');
+            $('#email').val(email);
+            var address = $(this).attr('data3');
+            $('#address').val(address);
+            var mobile = $(this).attr('data4');
+            $('#mobile').val(mobile);
         });
     });
 </script>
